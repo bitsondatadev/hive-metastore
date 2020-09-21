@@ -14,6 +14,8 @@ RUN curl -L https://www-us.apache.org/dist/hive/hive-standalone-metastore-${META
     cp mysql-connector-java-8.0.19/mysql-connector-java-8.0.19.jar ${HIVE_HOME}/lib/ && \
     rm -rf  mysql-connector-java-8.0.19
 
+RUN apt-get update && apt-get install -y netcat
+
 COPY scripts/entrypoint.sh /entrypoint.sh
 
 RUN groupadd -r hive --gid=1000 && \
