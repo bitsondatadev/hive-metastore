@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hive-metastore.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hive-metastore.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "hive-metastore.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "hive-metastore.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      initContainers:
+        - name: expand-configs
+          image: tempire/alpine-perl:3.14.0
+          command:
+            - sh
+          args:
+            - -c
+            - cp /tmp/hive-site.xml /opt/hive-configs/ && perl -pi -e 's/\${env:([_A-Z0-9]+)}/$ENV{$1}/g' /opt/hive-configs/hive-site.xml
+          volumeMounts:
+          - name: hive-config-map
+            mountPath: /tmp/hive-site.xml
+            subPath: hive-site.xml
+          - name: hive-configs
+            mountPath: /opt/hive-configs
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ include "hive-metastore.tag" . }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --service
+            - metastore
+          ports:
+            - name: thrift
+              containerPort: 9083
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: thrift
+          readinessProbe:
+            tcpSocket:
+              port: thrift
+          startupProbe:
+            failureThreshold: 60
+            tcpSocket:
+              port: thrift
+          env:
+            - name: HIVE_CONF_DIR
+              value: /opt/hive-configs
+          volumeMounts:
+            - name: hive-configs
+              mountPath: /opt/hive-configs
+      volumes:
+        - name: hive-configs
+          emptyDir: {}
+        - name: hive-config-map
+          configMap:
+            name: {{ include "hive-metastore.fullname" . }}

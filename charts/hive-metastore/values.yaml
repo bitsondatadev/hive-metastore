@@ -1,0 +1,22 @@
+image:
+  repository: bitsondatadev/hive-metastore
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 9083
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts: 
+    - host: localhost
+      paths: /hive-metastore
+
+replicaCount: 1
+
+hiveSiteXml: |
+  <configuration>
+  </configuration>
+
