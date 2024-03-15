@@ -10,7 +10,7 @@ MYSQL='mysql'
 POSTGRES='postgres'
 
 if [ "${METASTORE_TYPE}" = "${MYSQL}" ]; then
-  METASTORE_DB_HOSTNAME=${METASTORE_DB_HOSTNAME:-3306} # Default to 3306
+  METASTORE_DB_PORT=${METASTORE_DB_PORT:-3306} # Default to 3306
   echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on ${METASTORE_DB_PORT} ..."
   while ! nc -z ${METASTORE_DB_HOSTNAME} ${METASTORE_DB_PORT}; do
     sleep 1
@@ -24,7 +24,7 @@ if [ "${METASTORE_TYPE}" = "${MYSQL}" ]; then
 fi
 
 if [ "${METASTORE_TYPE}" = "${POSTGRES}" ]; then
-  METASTORE_DB_HOSTNAME=${METASTORE_DB_HOSTNAME:-5432} # Default to 5432
+  METASTORE_DB_PORT=${METASTORE_DB_PORT:-5432} # Default to 5432
   echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on ${METASTORE_DB_PORT} ..."
   while ! nc -z ${METASTORE_DB_HOSTNAME} ${METASTORE_DB_PORT}; do
     sleep 1
