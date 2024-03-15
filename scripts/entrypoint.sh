@@ -10,26 +10,26 @@ MYSQL='mysql'
 POSTGRES='postgres'
 
 if [ "${METASTORE_TYPE}" = "${MYSQL}" ]; then
-  echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on 3306 ..."
-  while ! nc -z ${METASTORE_DB_HOSTNAME} 3306; do
+  echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on ${METASTORE_DB_PORT} ..."
+  while ! nc -z ${METASTORE_DB_HOSTNAME} ${METASTORE_DB_PORT}; do
     sleep 1
   done
 
-  echo "Database on ${METASTORE_DB_HOSTNAME}:3306 started"
-  echo "Init apache hive metastore on ${METASTORE_DB_HOSTNAME}:3306"
+  echo "Database on ${METASTORE_DB_HOSTNAME}:${METASTORE_DB_PORT} started"
+  echo "Init apache hive metastore on ${METASTORE_DB_HOSTNAME}:${METASTORE_DB_PORT}"
 
   /opt/apache-hive-metastore-3.0.0-bin/bin/schematool -initSchema -dbType mysql
   /opt/apache-hive-metastore-3.0.0-bin/bin/start-metastore
 fi
 
 if [ "${METASTORE_TYPE}" = "${POSTGRES}" ]; then
-  echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on 5432 ..."
-  while ! nc -z ${METASTORE_DB_HOSTNAME} 5432; do
+  echo "Waiting for database on ${METASTORE_DB_HOSTNAME} to launch on ${METASTORE_DB_PORT} ..."
+  while ! nc -z ${METASTORE_DB_HOSTNAME} ${METASTORE_DB_PORT}; do
     sleep 1
   done
 
-  echo "Database on ${METASTORE_DB_HOSTNAME}:5432 started"
-  echo "Init apache hive metastore on ${METASTORE_DB_HOSTNAME}:5432"
+  echo "Database on ${METASTORE_DB_HOSTNAME}:${METASTORE_DB_PORT} started"
+  echo "Init apache hive metastore on ${METASTORE_DB_HOSTNAME}:${METASTORE_DB_PORT}"
 
   /opt/apache-hive-metastore-3.0.0-bin/bin/schematool -initSchema -dbType postgres
   /opt/apache-hive-metastore-3.0.0-bin/bin/start-metastore
